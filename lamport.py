@@ -1,5 +1,5 @@
 #-*- coding: UTF-8 -*-
-import os,sys,linecache,random,socket
+import os,sys,linecache,random,socket,time
 
 
 CLOCK = 0
@@ -56,7 +56,7 @@ def sendMessage():
 	s = socket.socket()
 	host = socket.gethostname()
 	node = LIST[getRandomNumber(1,len(LIST))]
-	if s.connect_ex((host,node[1]))
+	if s.connect_ex((host,node[1])) == 0: 
 		message = "message "+str(LIST[0][0])+" "+str(CLOCK)
 		s.send(bytes(message,'UTF-8'))
 	s.close()
@@ -72,6 +72,7 @@ def startRandomEventSeq():
 		else:
 			sendMessage()
 		i += 1
+	os._exit(0)
 
 def receiveMessage(nodeid,clock):
 #Receiving a message: r s t n, where s is the sender of the message, t is the timestamp that was in the message, and n is the clock value after running Lamport’s algorithm.
