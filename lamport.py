@@ -127,8 +127,8 @@ update clock count
 write result
 '''
 '''
-a thread for receiving message
-main process work for event
-what will happen if CLOCK got locked?
+ask
+if receive from multiple node at exact same time
+how to write the record?
 '''
 

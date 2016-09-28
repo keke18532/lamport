@@ -74,6 +74,7 @@ def startRandomEventSeq():
 		i += 1
 
 def receiveMessage(nodeid,clock):
+#Receiving a message: r s t n, where s is the sender of the message, t is the timestamp that was in the message, and n is the clock value after running Lamport’s algorithm.
 	global THREADNUM
 	global CLOCK
 	THREADNUM += 1
