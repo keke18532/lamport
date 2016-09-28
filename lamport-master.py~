@@ -8,7 +8,7 @@ def beat(port):
 	print(port)
 	s = socket.socket()
 	if s.connect_ex((socket.gethostname(),port)) == 0:
-		s.send(bytes('start','UTF-8'))
+		s.send(bytes('beat','UTF-8'))
 	s.close()
 
 
