@@ -1,5 +1,5 @@
 #-*- coding: UTF-8 -*-
-import os,sys,linecache,random,socket
+import os,sys,linecache,random,socket,time,_thread
 
 
 CLOCK = 0
@@ -47,19 +47,29 @@ def localEvent():
 #Local event: l n, where n is the amount by which the clock was increased
 	global CLOCK
 	CLOCK += getRandomNumber(1,5)
-	f = open(str(LIST[0][0])+'.txt', "w")
-        f.write(str(i)+"\n")
-    	f.close()
+	print('l',CLOCK)
 
 def sendMessage():
 #Sending a message: s r l, where r is the receiving node ID and l is the clock value sent in the message.
 	s = socket.socket()
 	host = socket.gethostname()
-	node = LIST[getRandomNumber(1,len(LIST))]
-	if s.connect_ex((host,node[1]))
-		message = "message "+str(LIST[0][0])+" "+str(CLOCK)
+	if len(LIST)==1:
+		return 0
+	node = LIST[getRandomNumber(1,len(LIST)-1)]
+	if s.connect_ex((host,node[1])) == 0: 
+		message = "message "+str(LIST[0][0])+" "+str(CLOCK)+" "+time.strftime("%H:%M:%S")
 		s.send(bytes(message,'UTF-8'))
+		print('s',node[0],CLOCK)
 	s.close()
+	'''try:		
+		s.send(bytes(message,'UTF-8'))
+	except Exception as err:  
+		a=0
+	finally:
+		#write in
+		print('s',node[0],CLOCK)
+		s.close()'''
+	
 
 def startRandomEventSeq():
 # get a random nuber from0 to 1
@@ -67,13 +77,15 @@ def startRandomEventSeq():
 # define 1 as sending message event
 	i = 0	
 	while i<100:
-		if getRandomnumber(0,1)==0:
+		if getRandomNumber(0,1)==0:
 			localEvent()
 		else:
 			sendMessage()
+		time.sleep(1)
 		i += 1
+	os._exit(0)
 
-def receiveMessage(nodeid,clock):
+def receiveMessage(nodeid,clock,timestamp):
 #Receiving a message: r s t n, where s is the sender of the message, t is the timestamp that was in the message, and n is the clock value after running Lamport’s algorithm.
 	global THREADNUM
 	global CLOCK
@@ -83,6 +95,8 @@ def receiveMessage(nodeid,clock):
 	if THREADNUM == 0:
 		CLOCKQUEUE.append(CLOCK)
 		CLOCK = max(CLOCKQUEUE) + 1
+		CLOCKQUEUE = []
+		print('r',nodeid,timestamp,CLOCK)
 
 
 def main(argv):
@@ -90,12 +104,12 @@ def main(argv):
 #send confirmation to other node and check exist node in the same time
 #waiting for confirmation from other node
 #waiting for start signal
-	if get_Config(argv):
+	if getConfig(argv):
 		print('ID:',LIST[0][0],' port:',LIST[0][1])
 	else:
 		print('No right line for configuration')
 	configs = linecache.getlines(argv[1])
-	send_Confirmation(configs)
+	sendConfirmation(configs)
 	s = socket.socket()
 	host = socket.gethostname()
 	s.bind((host,LIST[0][1]))
@@ -110,25 +124,17 @@ def main(argv):
 			if para[0] == 'confirm':
 				id = int(para[1])
 				port = int(para[2])
-				LIST.append([[id,port]])
-			elif para[0] == 'message'
-				_thread.start_new_thread(receiveMessage,(para[1],para[2],))
-			elif para[0] == 'start'
-				_thread.start_new_thread(startRandomEventSeq)
+				LIST.append([id,port])
+			elif para[0] == 'message':
+				_thread.start_new_thread(receiveMessage,(para[1],para[2],para[3]))
+			elif para[0] == 'start':
+				print('Node Start')
+				_thread.start_new_thread(startRandomEventSeq,())
 
 
 	
 
 main(sys.argv)
 
-'''
-receive message
-update clock count
-write result
-'''
-'''
-a thread for receiving message
-main process work for event
-what will happen if CLOCK got locked?
-'''
+
 
