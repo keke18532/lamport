@@ -36,7 +36,7 @@ def sendConfirmation(configs):
 		if port != LIST[0][1]:
 			s = socket.socket()
 			if s.connect_ex((host,port)) == 0:
-				LIST.append([[id,port]])
+				LIST.append([id,port])
 				string='confirm '+str(LIST[0][0])+' '+str(LIST[0][1])
 				s.send(bytes(string,'UTF-8'))
 			s.close()
@@ -57,14 +57,14 @@ def sendMessage():
 		return 0
 	node = LIST[getRandomNumber(1,len(LIST)-1)]
 	if s.connect_ex((host,node[1])) == 0: 
-		message = "message "+str(LIST[0][0])+" "+str(CLOCK)+" "+time.strftime("%H:%M:%S")
+		message = "message "+str(LIST[0][0])+" "+str(CLOCK)
 		s.send(bytes(message,'UTF-8'))
 		print('s',node[0],CLOCK)
 	s.close()
 	'''try:		
 		s.send(bytes(message,'UTF-8'))
 	except Exception as err:  
-		a=0
+		
 	finally:
 		#write in
 		print('s',node[0],CLOCK)
@@ -77,18 +77,20 @@ def startRandomEventSeq():
 # define 1 as sending message event
 	i = 0	
 	while i<100:
-		if getRandomNumber(0,1)==0:
-			localEvent()
-		else:
-			sendMessage()
-		time.sleep(1)
-		i += 1
+		if THREADNUM == 0:
+			if getRandomNumber(0,1)==0:
+				localEvent()
+			else:
+				sendMessage()
+			i += 1
 	os._exit(0)
 
-def receiveMessage(nodeid,clock,timestamp):
+def receiveMessage(nodeid,clock):
 #Receiving a message: r s t n, where s is the sender of the message, t is the timestamp that was in the message, and n is the clock value after running Lamport’s algorithm.
 	global THREADNUM
 	global CLOCK
+	global CLOCKQUEUE
+	local = CLOCK
 	THREADNUM += 1
 	CLOCKQUEUE.append(int(clock))
 	THREADNUM -= 1
@@ -96,7 +98,7 @@ def receiveMessage(nodeid,clock,timestamp):
 		CLOCKQUEUE.append(CLOCK)
 		CLOCK = max(CLOCKQUEUE) + 1
 		CLOCKQUEUE = []
-		print('r',nodeid,timestamp,CLOCK)
+		print('r',nodeid,local,CLOCK)
 
 
 def main(argv):
@@ -119,14 +121,14 @@ def main(argv):
 		string = str(conn.recv(1024)).strip()
 		string = string[2:len(string)-1]
 		if  string != '':
-			print(string)
 			para =string.split(' ')
 			if para[0] == 'confirm':
 				id = int(para[1])
 				port = int(para[2])
 				LIST.append([id,port])
+				print(LIST)
 			elif para[0] == 'message':
-				_thread.start_new_thread(receiveMessage,(para[1],para[2],para[3]))
+				_thread.start_new_thread(receiveMessage,(para[1],para[2],))
 			elif para[0] == 'start':
 				print('Node Start')
 				_thread.start_new_thread(startRandomEventSeq,())
