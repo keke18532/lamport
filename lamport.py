@@ -45,7 +45,6 @@ def sendConfirmation(configs):
 				s.send(bytes(string,'UTF-8'))
 			s.close()
 		i+=1
-	print('Sending finished')
 
 def localEvent():
 #Local event: l n, where n is the amount by which the clock was increased
@@ -119,6 +118,7 @@ def main(argv):
 		return
 	configs = linecache.getlines(argv[1])
 	sendConfirmation(configs)
+	print('Init Done')
 	s = socket.socket()
 	host = socket.gethostname()
 	s.bind((host,LIST[0][1]))
@@ -137,7 +137,7 @@ def main(argv):
 				_thread.start_new_thread(receiveMessage,(para[1],para[2],))
 			elif para[0] == 'start':
 				print('Node Start')
-				print(LIST)
+				print('Activate node: \n',LIST)
 				_thread.start_new_thread(startRandomEventSeq,())
 
 
