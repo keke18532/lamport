@@ -111,6 +111,7 @@ def main(argv):
 #send confirmation to other node and check exist node in the same time
 #waiting for confirmation from other node
 #waiting for start signal
+#receiving the coming message 
 	if getConfig(argv):
 		print('ID:',LIST[0][0],' port:',LIST[0][1])
 	else:

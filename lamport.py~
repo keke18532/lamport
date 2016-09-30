@@ -79,7 +79,7 @@ def startRandomEventSeq():
 # define 0 as local event
 # define 1 as sending message event
 	i = 0	
-	while i<10:
+	while i<100:
 		if THREADNUM == 0:
 			if getRandomNumber(0,1)==0:
 				localEvent()
