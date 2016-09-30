@@ -32,7 +32,6 @@ def sendConfirmation(configs):
 		para = configs[i].split(' ')
 		id = int(para[0])
 		port = int(para[1])
-		print(id,' ',port)
 		if port != LIST[0][1]:
 			s = socket.socket()
 			if s.connect_ex((host,port)) == 0:
@@ -82,7 +81,9 @@ def startRandomEventSeq():
 				localEvent()
 			else:
 				sendMessage()
+			time.sleep(1)
 			i += 1
+	time.sleep(5)	
 	os._exit(0)
 
 def receiveMessage(nodeid,clock):
@@ -98,7 +99,7 @@ def receiveMessage(nodeid,clock):
 		CLOCKQUEUE.append(CLOCK)
 		CLOCK = max(CLOCKQUEUE) + 1
 		CLOCKQUEUE = []
-		print('r',nodeid,local,CLOCK)
+		print('r',nodeid,clock,CLOCK)
 
 
 def main(argv):
@@ -126,11 +127,11 @@ def main(argv):
 				id = int(para[1])
 				port = int(para[2])
 				LIST.append([id,port])
-				print(LIST)
 			elif para[0] == 'message':
 				_thread.start_new_thread(receiveMessage,(para[1],para[2],))
 			elif para[0] == 'start':
 				print('Node Start')
+				print(LIST)
 				_thread.start_new_thread(startRandomEventSeq,())
 
 
