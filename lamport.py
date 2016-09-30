@@ -10,16 +10,21 @@ CLOCKQUEUE = []
 def getConfig(argv):
 	if(len(argv) < 3):
 		return False
-	else :
-		config = linecache.getline(argv[1],int(argv[2]))
-		#if find right record from file set id and port, then return true, else return false
-		if(config.strip() == ''):
-			return False
-		else:
-			para = config.split(' ')
-			global LIST
-			LIST += [[int(para[0]),int(para[1])]]
-			return True
+	config = linecache.getline(argv[1],int(argv[2]))
+	if(config.strip() == ''):
+		return False
+	#if find right record from file set id and port, then return true, else return false
+	para = config.split(' ')
+	port=int(para[1])
+	s = socket.socket()
+	result = True
+	if s.connect_ex((socket.gethostname(),port)) == 0:
+		print('Port in use')
+		result = False
+	global LIST
+	LIST += [[int(para[0]),port]]
+	s.close()
+	return result
 
 def getRandomNumber(min_number,max_number):
 	return int(random.random()*(max_number-min_number+1))+min_number      
@@ -111,6 +116,7 @@ def main(argv):
 		print('ID:',LIST[0][0],' port:',LIST[0][1])
 	else:
 		print('No right line for configuration')
+		return
 	configs = linecache.getlines(argv[1])
 	sendConfirmation(configs)
 	s = socket.socket()
